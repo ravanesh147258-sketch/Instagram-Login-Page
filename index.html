@@ -1,74 +1,1356 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ta">
 <head>
-	<meta charset="UTF-8">
-	<title>Instagram Login Page</title>
-	<link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<title>👻 Ghost Chase Runner</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  background: #070a16;
+  color: white;
+  font-family: Arial, "Noto Sans Tamil", sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+#gameContainer {
+  width: 100%;
+  max-width: 950px;
+  margin: auto;
+  text-align: center;
+}
+
+h1 {
+  margin: 8px 0;
+  font-size: 24px;
+}
+
+#hud {
+  height: 48px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #151b35;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #10162b;
+}
+
+#menu,
+#gameOver,
+#levelComplete {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90%, 420px);
+  padding: 28px;
+  background: rgba(8, 11, 25, .96);
+  border: 2px solid #6c4cff;
+  border-radius: 20px;
+  text-align: center;
+  z-index: 10;
+  box-shadow: 0 0 30px rgba(108,76,255,.4);
+}
+
+#gameOver,
+#levelComplete {
+  display: none;
+}
+
+button {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 24px;
+  margin: 7px;
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#startBtn {
+  background: #6c4cff;
+}
+
+#restartBtn {
+  background: #e63946;
+}
+
+#nextBtn {
+  background: #00a878;
+}
+
+#controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 12px;
+  background: #0d1124;
+}
+
+.controlBtn {
+  width: 45%;
+  max-width: 200px;
+  padding: 17px 10px;
+  font-size: 18px;
+}
+
+#jumpBtn {
+  background: #2878ff;
+}
+
+#fastBtn {
+  background: #ff8a00;
+}
+
+.controlBtn:active,
+button:active {
+  transform: scale(.94);
+}
+
+#message {
+  font-size: 14px;
+  color: #bfc5df;
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+
+  h1 {
+    font-size: 20px;
+  }
+
+  #hud {
+    font-size: 12px;
+  }
+
+  .controlBtn {
+    font-size: 16px;
+    padding: 18px 5px;
+  }
+}
+</style>
 </head>
+
 <body>
 
-<div class="wrapper">
-	<div class="header">
-		<div class="top">
-			<div class="logo">
-				<img src="instagram.png" alt="instagram" style="width: 175px;">
-			</div>
-			<div class="form">
-				<div class="input_field">
-					<input type="text" placeholder="Phone number, username, or email" class="input">
-				</div>
-				<div class="input_field">
-					<input type="password" placeholder="Password" class="input">
-				</div>
-				<div class="btn"><a href="#">Log In</a></div>
-			</div>
-			<div class="or">
-				<div class="line"></div>
-				<p>OR</p>
-				<div class="line"></div>
-			</div>
-			<div class="dif">
-				<div class="fb">
-					<img src="facebook.png" alt="facebook">
-					<p>Log in with Facebook</p>
-				</div>
-				<div class="forgot">
-					<a href="#">Forgot password?</a>
-				</div>
-			</div>
-		</div>
-		<div class="signup">
-			<p>Don't have an account? <a href="#">Sign up</a></p>
-		</div>
-		<div class="apps">
-			<p>Get the app.</p>
-			<div class="icons">
-				<a href="#"><img src="appstore.png" alt="appstore"></a>
-				<a href="#"><img src="googleplay.png" alt="googleplay"></a>
-			</div>
-		</div>
-	</div>
-	<div class="footer">
-		<div class="links">
-			<ul>
-				<li><a href="#">ABOUT US</a></li>
-				<li><a href="#">SUPPORT</a></li>
-				<li><a href="#">PRESS</a></li>
-				<li><a href="#">API</a></li>
-				<li><a href="#">JOBS</a></li>
-				<li><a href="#">PRIVACY</a></li>
-				<li><a href="#">TERMS</a></li>
-				<li><a href="#">DIRECTORY</a></li>
-				<li><a href="#">PROFILES</a></li>
-				<li><a href="#">HASHTAGS</a></li>
-				<li><a href="#">LANGUAGE</a></li>
-			</ul>
-		</div>
-		<div class="copyright">
-			© 2019 INSTAGRAM
-		</div>
-	</div>
+<div id="gameContainer">
+
+  <h1>👻 GHOST CHASE RUNNER</h1>
+
+  <div id="hud">
+    <span>⭐ <b id="score">0</b></span>
+    <span>❤️ <b id="lives">3</b></span>
+    <span>🏆 LEVEL <b id="level">1</b>/5</span>
+  </div>
+
+  <canvas id="gameCanvas"
+          width="900"
+          height="500">
+  </canvas>
+
+  <div id="controls">
+
+    <button
+      id="jumpBtn"
+      class="controlBtn">
+      ⬆️ JUMP
+    </button>
+
+    <button
+      id="fastBtn"
+      class="controlBtn">
+      ⚡ FAST
+    </button>
+
+  </div>
+
 </div>
 
+
+<!-- START MENU -->
+
+<div id="menu">
+
+  <h2>👻 Ghost Chase</h2>
+
+  <p>
+    பேய் உன்னைத் துரத்துகிறது!<br>
+    தடைகளைத் தாண்டி ஓடி தப்பிக்கவும்.
+  </p>
+
+  <p>
+    ⬆️ JUMP = குதிக்க<br>
+    ⚡ FAST = வேகமாக ஓட
+  </p>
+
+  <button id="startBtn">
+    ▶ START GAME
+  </button>
+
+</div>
+
+
+<!-- LEVEL COMPLETE -->
+
+<div id="levelComplete">
+
+  <h2>🎉 LEVEL COMPLETE!</h2>
+
+  <p>
+    அடுத்த level இன்னும் வேகமாக இருக்கும்!
+  </p>
+
+  <button id="nextBtn">
+    ▶ NEXT LEVEL
+  </button>
+
+</div>
+
+
+<!-- GAME OVER -->
+
+<div id="gameOver">
+
+  <h2>💀 GAME OVER</h2>
+
+  <p>
+    உன் Score:
+    <b id="finalScore">0</b>
+  </p>
+
+  <button id="restartBtn">
+    🔄 PLAY AGAIN
+  </button>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas =
+  document.getElementById("gameCanvas");
+
+const ctx =
+  canvas.getContext("2d");
+
+
+/* =====================================================
+   GAME VARIABLES
+===================================================== */
+
+let gameRunning = false;
+
+let score = 0;
+let lives = 3;
+
+let level = 1;
+
+let frame = 0;
+
+let speed = 5;
+
+let fastMode = false;
+
+let fastTimer = 0;
+
+let obstacles = [];
+let coins = [];
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
+
+const player = {
+
+  x: 180,
+
+  y: 380,
+
+  width: 42,
+
+  height: 60,
+
+  velocityY: 0,
+
+  gravity: 0.8,
+
+  jumpPower: -16
+
+};
+
+
+/* =====================================================
+   GHOST
+===================================================== */
+
+const ghost = {
+
+  x: 50,
+
+  y: 385,
+
+  width: 50,
+
+  height: 55
+
+};
+
+
+/* =====================================================
+   DOM
+===================================================== */
+
+const scoreElement =
+  document.getElementById("score");
+
+const livesElement =
+  document.getElementById("lives");
+
+const levelElement =
+  document.getElementById("level");
+
+const menu =
+  document.getElementById("menu");
+
+const gameOverScreen =
+  document.getElementById("gameOver");
+
+const levelCompleteScreen =
+  document.getElementById("levelComplete");
+
+const finalScore =
+  document.getElementById("finalScore");
+
+
+/* =====================================================
+   START GAME
+===================================================== */
+
+function startGame() {
+
+  score = 0;
+
+  lives = 3;
+
+  level = 1;
+
+  speed = 5;
+
+  frame = 0;
+
+  fastMode = false;
+
+  fastTimer = 0;
+
+  obstacles = [];
+
+  coins = [];
+
+  player.x = 180;
+
+  player.y = 380;
+
+  player.velocityY = 0;
+
+  ghost.x = 50;
+
+  gameRunning = true;
+
+  menu.style.display = "none";
+
+  gameOverScreen.style.display = "none";
+
+  levelCompleteScreen.style.display = "none";
+
+  updateHUD();
+
+  requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =====================================================
+   NEXT LEVEL
+===================================================== */
+
+function nextLevel() {
+
+  level++;
+
+  speed += 1.5;
+
+  obstacles = [];
+
+  coins = [];
+
+  frame = 0;
+
+  player.x = 180;
+
+  player.y = 380;
+
+  player.velocityY = 0;
+
+  ghost.x = 40;
+
+  levelCompleteScreen.style.display = "none";
+
+  updateHUD();
+
+}
+
+
+/* =====================================================
+   JUMP
+===================================================== */
+
+function jump() {
+
+  if (!gameRunning) return;
+
+  if (player.y >= 379) {
+
+    player.velocityY =
+      player.jumpPower;
+
+  }
+
+}
+
+
+/* =====================================================
+   FAST
+===================================================== */
+
+function activateFast() {
+
+  if (!gameRunning) return;
+
+  fastMode = true;
+
+  fastTimer = 100;
+
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+document
+  .getElementById("startBtn")
+  .addEventListener("click", startGame);
+
+document
+  .getElementById("restartBtn")
+  .addEventListener("click", startGame);
+
+document
+  .getElementById("nextBtn")
+  .addEventListener("click", nextLevel);
+
+
+/* =====================================================
+   MOBILE BUTTONS
+===================================================== */
+
+const jumpButton =
+  document.getElementById("jumpBtn");
+
+const fastButton =
+  document.getElementById("fastBtn");
+
+
+jumpButton.addEventListener(
+  "touchstart",
+  function(e) {
+
+    e.preventDefault();
+
+    jump();
+
+  },
+  { passive: false }
+);
+
+
+fastButton.addEventListener(
+  "touchstart",
+  function(e) {
+
+    e.preventDefault();
+
+    activateFast();
+
+  },
+  { passive: false }
+);
+
+
+/* Mouse support */
+
+jumpButton.addEventListener(
+  "mousedown",
+  jump
+);
+
+fastButton.addEventListener(
+  "mousedown",
+  activateFast
+);
+
+
+/* =====================================================
+   KEYBOARD
+===================================================== */
+
+document.addEventListener(
+  "keydown",
+  function(e) {
+
+    if (
+      e.code === "Space" ||
+      e.code === "ArrowUp"
+    ) {
+
+      e.preventDefault();
+
+      jump();
+
+    }
+
+    if (
+      e.code === "ShiftLeft" ||
+      e.code === "ShiftRight"
+    ) {
+
+      activateFast();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   CREATE OBSTACLE
+===================================================== */
+
+function createObstacle() {
+
+  const height =
+    45 + Math.random() * 65;
+
+  obstacles.push({
+
+    x: canvas.width + 30,
+
+    y: 440 - height,
+
+    width:
+      35 + Math.random() * 35,
+
+    height: height
+
+  });
+
+}
+
+
+/* =====================================================
+   CREATE COIN
+===================================================== */
+
+function createCoin() {
+
+  coins.push({
+
+    x: canvas.width + 30,
+
+    y:
+      250 +
+      Math.random() * 120,
+
+    radius: 11
+
+  });
+
+}
+
+
+/* =====================================================
+   COLLISION
+===================================================== */
+
+function collision(a, b) {
+
+  return (
+
+    a.x <
+      b.x + b.width &&
+
+    a.x + a.width >
+      b.x &&
+
+    a.y <
+      b.y + b.height &&
+
+    a.y + a.height >
+      b.y
+
+  );
+
+}
+
+
+/* =====================================================
+   UPDATE
+===================================================== */
+
+function update() {
+
+  frame++;
+
+
+  /* FAST TIMER */
+
+  if (fastTimer > 0) {
+
+    fastTimer--;
+
+  } else {
+
+    fastMode = false;
+
+  }
+
+
+  const currentSpeed =
+    fastMode
+      ? speed * 1.8
+      : speed;
+
+
+  /* PLAYER GRAVITY */
+
+  player.velocityY +=
+    player.gravity;
+
+  player.y +=
+    player.velocityY;
+
+
+  if (player.y >= 380) {
+
+    player.y = 380;
+
+    player.velocityY = 0;
+
+  }
+
+
+  /* GHOST */
+
+  ghost.x +=
+    0.35 +
+    level * 0.08;
+
+
+  if (ghost.x >
+      player.x - 75) {
+
+    ghost.x =
+      player.x - 75;
+
+  }
+
+
+  /* OBSTACLES */
+
+  const obstacleRate =
+    Math.max(
+      45,
+      110 - level * 10
+    );
+
+
+  if (frame % obstacleRate === 0) {
+
+    createObstacle();
+
+  }
+
+
+  /* COINS */
+
+  if (frame % 65 === 0) {
+
+    createCoin();
+
+  }
+
+
+  /* MOVE */
+
+  obstacles.forEach(
+    obstacle => {
+
+      obstacle.x -=
+        currentSpeed;
+
+    }
+  );
+
+
+  coins.forEach(
+    coin => {
+
+      coin.x -=
+        currentSpeed;
+
+    }
+  );
+
+
+  /* OBSTACLE COLLISION */
+
+  obstacles.forEach(
+    obstacle => {
+
+      if (
+        collision(
+          player,
+          obstacle
+        )
+      ) {
+
+        obstacle.x = -300;
+
+        lives--;
+
+        ghost.x -= 30;
+
+        updateHUD();
+
+        if (lives <= 0) {
+
+          endGame();
+
+        }
+
+      }
+
+    }
+  );
+
+
+  /* COIN COLLECTION */
+
+  coins.forEach(
+    coin => {
+
+      const dx =
+        player.x +
+        player.width / 2 -
+        coin.x;
+
+      const dy =
+        player.y +
+        player.height / 2 -
+        coin.y;
+
+      const distance =
+        Math.sqrt(
+          dx * dx +
+          dy * dy
+        );
+
+
+      if (distance < 35) {
+
+        score += 10;
+
+        coin.x = -200;
+
+        updateHUD();
+
+      }
+
+    }
+  );
+
+
+  /* REMOVE */
+
+  obstacles =
+    obstacles.filter(
+      obstacle =>
+        obstacle.x > -150
+    );
+
+
+  coins =
+    coins.filter(
+      coin =>
+        coin.x > -100
+    );
+
+
+  /* SCORE */
+
+  if (frame % 10 === 0) {
+
+    score++;
+
+    updateHUD();
+
+  }
+
+
+  /* LEVEL SYSTEM */
+
+  checkLevel();
+
+
+}
+
+
+/* =====================================================
+   LEVEL CHECK
+===================================================== */
+
+function checkLevel() {
+
+  let target = 100;
+
+  if (level === 2)
+    target = 250;
+
+  if (level === 3)
+    target = 450;
+
+  if (level === 4)
+    target = 700;
+
+  if (level === 5)
+    target = 1000;
+
+
+  if (
+    score >= target &&
+    level < 5
+  ) {
+
+    gameRunning = false;
+
+    levelCompleteScreen
+      .style.display = "block";
+
+  }
+
+
+  if (
+    score >= 1000 &&
+    level === 5
+  ) {
+
+    gameRunning = false;
+
+    alert(
+      "🏆 CONGRATULATIONS! You completed all 5 levels!"
+    );
+
+    endGame();
+
+  }
+
+}
+
+
+/* =====================================================
+   HUD
+===================================================== */
+
+function updateHUD() {
+
+  scoreElement.textContent =
+    score;
+
+  livesElement.textContent =
+    lives;
+
+  levelElement.textContent =
+    level;
+
+}
+
+
+/* =====================================================
+   BACKGROUND
+===================================================== */
+
+function drawBackground() {
+
+  /* SKY */
+
+  const gradient =
+    ctx.createLinearGradient(
+      0,
+      0,
+      0,
+      canvas.height
+    );
+
+  gradient.addColorStop(
+    0,
+    "#080d24"
+  );
+
+  gradient.addColorStop(
+    1,
+    "#202943"
+  );
+
+  ctx.fillStyle =
+    gradient;
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  /* MOON */
+
+  ctx.fillStyle =
+    "#fff7c2";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    760,
+    80,
+    45,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  /* TREES */
+
+  for (
+    let i = 0;
+    i < 10;
+    i++
+  ) {
+
+    let x =
+      (
+        i * 120 -
+        frame * 0.35
+      ) %
+      (canvas.width + 150);
+
+
+    if (x < -100) {
+
+      x +=
+        canvas.width + 150;
+
+    }
+
+
+    ctx.fillStyle =
+      "#101b19";
+
+
+    ctx.fillRect(
+      x,
+      290,
+      18,
+      150
+    );
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      x - 50,
+      330
+    );
+
+    ctx.lineTo(
+      x + 9,
+      210
+    );
+
+    ctx.lineTo(
+      x + 68,
+      330
+    );
+
+    ctx.fill();
+
+  }
+
+
+  /* GROUND */
+
+  ctx.fillStyle =
+    "#292d38";
+
+  ctx.fillRect(
+    0,
+    440,
+    canvas.width,
+    60
+  );
+
+
+  /* ROAD LINES */
+
+  ctx.fillStyle =
+    "#777";
+
+  for (
+    let x = -100;
+    x < canvas.width + 100;
+    x += 100
+  ) {
+
+    const roadX =
+      x -
+      (
+        frame *
+        speed
+      ) % 100;
+
+    ctx.fillRect(
+      roadX,
+      468,
+      50,
+      5
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   PLAYER
+===================================================== */
+
+function drawPlayer() {
+
+  /* BODY */
+
+  ctx.fillStyle =
+    "#36b9ff";
+
+  ctx.fillRect(
+    player.x,
+    player.y + 20,
+    player.width,
+    40
+  );
+
+
+  /* HEAD */
+
+  ctx.beginPath();
+
+  ctx.arc(
+    player.x + 21,
+    player.y + 15,
+    20,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fill();
+
+
+  /* EYES */
+
+  ctx.fillStyle =
+    "#111";
+
+  ctx.fillRect(
+    player.x + 11,
+    player.y + 10,
+    6,
+    8
+  );
+
+  ctx.fillRect(
+    player.x + 25,
+    player.y + 10,
+    6,
+    8
+  );
+
+
+  /* LEGS */
+
+  ctx.fillStyle =
+    "#164a91";
+
+  ctx.fillRect(
+    player.x + 5,
+    player.y + 55,
+    11,
+    20
+  );
+
+  ctx.fillRect(
+    player.x + 27,
+    player.y + 55,
+    11,
+    20
+  );
+
+}
+
+
+/* =====================================================
+   GHOST
+===================================================== */
+
+function drawGhost() {
+
+  ctx.fillStyle =
+    "#eeeeff";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    ghost.x + 25,
+    ghost.y + 22,
+    25,
+    Math.PI,
+    0
+  );
+
+  ctx.lineTo(
+    ghost.x + 50,
+    ghost.y + 55
+  );
+
+  ctx.lineTo(
+    ghost.x + 38,
+    ghost.y + 47
+  );
+
+  ctx.lineTo(
+    ghost.x + 25,
+    ghost.y + 55
+  );
+
+  ctx.lineTo(
+    ghost.x + 12,
+    ghost.y + 47
+  );
+
+  ctx.lineTo(
+    ghost.x,
+    ghost.y + 55
+  );
+
+  ctx.closePath();
+
+  ctx.fill();
+
+
+  /* EYES */
+
+  ctx.fillStyle =
+    "#e63946";
+
+  ctx.fillRect(
+    ghost.x + 13,
+    ghost.y + 18,
+    7,
+    9
+  );
+
+  ctx.fillRect(
+    ghost.x + 30,
+    ghost.y + 18,
+    7,
+    9
+  );
+
+}
+
+
+/* =====================================================
+   OBSTACLES
+===================================================== */
+
+function drawObstacles() {
+
+  obstacles.forEach(
+    obstacle => {
+
+      ctx.fillStyle =
+        "#9b5de5";
+
+      ctx.fillRect(
+        obstacle.x,
+        obstacle.y,
+        obstacle.width,
+        obstacle.height
+      );
+
+
+      ctx.fillStyle =
+        "#d8b4fe";
+
+      ctx.fillRect(
+        obstacle.x + 5,
+        obstacle.y + 5,
+        obstacle.width - 10,
+        6
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   COINS
+===================================================== */
+
+function drawCoins() {
+
+  coins.forEach(
+    coin => {
+
+      ctx.beginPath();
+
+      ctx.arc(
+        coin.x,
+        coin.y,
+        coin.radius,
+        0,
+        Math.PI * 2
+      );
+
+      ctx.fillStyle =
+        "#ffd166";
+
+      ctx.fill();
+
+      ctx.strokeStyle =
+        "#fff";
+
+      ctx.stroke();
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   DRAW
+===================================================== */
+
+function draw() {
+
+  drawBackground();
+
+  drawCoins();
+
+  drawObstacles();
+
+  drawGhost();
+
+  drawPlayer();
+
+}
+
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+
+function gameLoop() {
+
+  if (!gameRunning) {
+
+    draw();
+
+    return;
+
+  }
+
+
+  update();
+
+  draw();
+
+  requestAnimationFrame(
+    gameLoop
+  );
+
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+function endGame() {
+
+  gameRunning = false;
+
+  finalScore.textContent =
+    score;
+
+  gameOverScreen.style.display =
+    "block";
+
+}
+
+
+/* =====================================================
+   INITIAL DRAW
+===================================================== */
+
+draw();
+
+</script>
+
 </body>
-</html>
+	</html>
